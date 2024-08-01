@@ -2,4 +2,4 @@ Flask
 Gunicorn
 selenium
 undetected_chromedriver
-BeautifulSoup
+beautifulsoup4

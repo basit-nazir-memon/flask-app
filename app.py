@@ -66,11 +66,11 @@ def scrape():
     driver = None
     try:
         # Initialize Chrome options
-        options = Options()
-        options.headless = True
+        # options = Options()
+        # options.headless = True
 
         # Initialize the undetected-chromedriver with options
-        driver = uc.Chrome(options=options)
+        driver = uc.Chrome()
 
         # Load credentials from config file
         with open('config.json') as config_file:

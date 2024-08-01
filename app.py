@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 import time
 import json
 import random
-import os
 
 app = Flask(__name__)
 
@@ -64,13 +63,14 @@ def filter_criteria(job):
 
 @app.route('/scrape', methods=['GET'])
 def scrape():
+    driver = None
     try:
         # Initialize Chrome options
-        # options = Options()
-        # options.headless = True
+        options = Options()
+        options.headless = True
 
         # Initialize the undetected-chromedriver with options
-        driver = uc.Chrome()
+        driver = uc.Chrome(options=options)
 
         # Load credentials from config file
         with open('config.json') as config_file:
@@ -85,10 +85,6 @@ def scrape():
         # Wait for results to load
         time.sleep(random.randint(10, 20))
 
-        # Save screenshot
-        screenshot_path = os.path.join(os.getcwd(), 'screenshot1.png')
-        driver.save_screenshot(screenshot_path)
-
         try:
             accept_cookie_btn = driver.find_element(By.ID, 'onetrust-accept-btn-handler')
             if accept_cookie_btn:
@@ -98,10 +94,6 @@ def scrape():
             print("No cookie acceptance button found, continuing...")
 
         time.sleep(random.randint(1, 2))
-
-        # Save screenshot
-        screenshot_path = os.path.join(os.getcwd(), 'screenshot2.png')
-        driver.save_screenshot(screenshot_path)
 
         email_field = driver.find_element(By.XPATH, '//input[@type="text"]')
         email_field.send_keys(email)
@@ -136,6 +128,7 @@ def scrape():
         soup = BeautifulSoup(page_html, 'html.parser')
         data = extract_data(soup)
 
+        # Optionally filter the data
         # filtered_data = [job for job in data if filter_criteria(job)]
 
         # Prepare JSON response
@@ -148,7 +141,8 @@ def scrape():
         return str(e), 500
 
     finally:
-        driver.quit()
+        if driver:
+            driver.quit()
 
 if __name__ == '__main__':
     app.run(debug=True)
